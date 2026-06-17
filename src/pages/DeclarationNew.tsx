@@ -71,10 +71,16 @@ export default function DeclarationNew() {
   }, [selectedHs, goods.declaredValue, calculateTax])
 
   const handleHsSearch = (value: string) => {
-    setGoods(prev => ({ ...prev, hsCode: value }))
     if (selectedHs && selectedHs.hsCode !== value) {
       setSelectedHs(null)
       setTaxBreakdown(null)
+      setGoods(prev => ({
+        ...prev,
+        hsCode: value,
+        name: prev.name === selectedHs.description ? '' : prev.name,
+      }))
+    } else {
+      setGoods(prev => ({ ...prev, hsCode: value }))
     }
     if (value.trim().length >= 2) {
       const results = searchHSCode(value.trim())
