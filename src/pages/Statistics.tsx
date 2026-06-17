@@ -95,9 +95,20 @@ export default function Statistics() {
     return Array.from(monthSet).sort()
   }, [sortedDeclarations])
 
+  const buildFullMonthRange = (n: number, fromSet?: Set<string>): string[] => {
+    const months: string[] = []
+    const now = new Date()
+    for (let i = n - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      if (!fromSet || fromSet.has(key) || true) months.push(key)
+    }
+    return months
+  }
+
   const last12Months = useMemo(() => {
-    return allMonths.slice(-12)
-  }, [allMonths])
+    return buildFullMonthRange(12)
+  }, [])
 
   const monthlyBatchData: MonthlyBatch[] = useMemo(() => {
     return last12Months.map((month) => {
@@ -136,8 +147,8 @@ export default function Statistics() {
   }, [sortedDeclarations, last12Months])
 
   const last6Months = useMemo(() => {
-    return allMonths.slice(-6)
-  }, [allMonths])
+    return buildFullMonthRange(6)
+  }, [])
 
   const budgetPrediction = useMemo(() => {
     const last6Tax = last6Months.map((month) => {

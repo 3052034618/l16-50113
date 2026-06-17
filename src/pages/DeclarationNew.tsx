@@ -72,6 +72,10 @@ export default function DeclarationNew() {
 
   const handleHsSearch = (value: string) => {
     setGoods(prev => ({ ...prev, hsCode: value }))
+    if (selectedHs && selectedHs.hsCode !== value) {
+      setSelectedHs(null)
+      setTaxBreakdown(null)
+    }
     if (value.trim().length >= 2) {
       const results = searchHSCode(value.trim())
       setHsResults(results)
@@ -91,9 +95,13 @@ export default function DeclarationNew() {
   const handleSubmit = () => {
     if (!client || !goods.hsCode || !goods.name || goods.declaredValue <= 0) return
 
-    const category = selectedHs?.category || 'default'
+    const currentHs = queryHSCode(goods.hsCode)
+    if (!currentHs) {
+      return
+    }
+    const category = currentHs.category
     const docs = generateDocuments(category)
-    const tax = taxBreakdown || { customsDuty: 0, vat: 0, consumptionTax: 0, total: 0 }
+    const tax = calculateTax(currentHs.hsCode, goods.declaredValue) || { customsDuty: 0, vat: 0, consumptionTax: 0, total: 0 }
 
     const newDecl = addDeclaration({
       type: declType,
